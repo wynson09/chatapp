@@ -3,8 +3,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
 import { db } from "../firebase";
+import Notification from "./Notification";
 
-const Chats = () => {
+const Chats = ({ doneNotify }) => {
   const [chats, setChats] = useState([]);
 
   const { currentUser } = useContext(AuthContext);
@@ -20,9 +21,8 @@ const Chats = () => {
         unsub();
       };
     };
-
     currentUser.uid && getChats();
-  }, [currentUser.uid]);
+  }, [currentUser.uid, dispatch]);
 
   const handleSelect = (u) => {
     dispatch({ type: "CHANGE_USER", payload: u });
@@ -30,7 +30,7 @@ const Chats = () => {
 
   return (
     <div className="chats">
-      {Object.entries(chats)
+      {Object?.entries(chats)
         ?.sort((a, b) => b[1].date - a[1].date)
         .map((chat) => (
           <div
@@ -43,6 +43,14 @@ const Chats = () => {
               <span>{chat[1]?.userInfo?.displayName}</span>
               <p>{chat[1]?.lastMessage?.text}</p>
             </div>
+            <Notification
+              userMsg={chat[1].senderID}
+              currentUser={currentUser.uid}
+              seen={chat[1].seen}
+              chatID={chat[0]}
+              doneNotify={doneNotify}
+              dataUser={chat[1].userInfo.uid}
+            />
           </div>
         ))}
     </div>
